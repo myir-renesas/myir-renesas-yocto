@@ -1,0 +1,341 @@
+From 4d49f35c1a20c3069307edb3632345fe7d446448 Mon Sep 17 00:00:00 2001
+From: Long Luu <long.luu.ur@renesas.com>
+Date: Wed, 26 Mar 2025 12:01:44 +0700
+Subject: [PATCH] rzt2: linux-renesas: Add support changing ports to
+ MII<->RGMII for RZT2H board.
+
+This patch support changing ports to MII<->RGMII via config
+MACHINE_FEATURES_append on local.conf for RZT2H board.
+
+Signed-off-by: Long Luu <long.luu.ur@renesas.com>
+---
+ ...t2h-dev-Config-100-mbps-Ethernet-for.patch | 89 ++++++++++++++++++
+ .../u-boot/u-boot_2021.10.bbappend            |  8 ++
+ ...s-r9a09g077m44-dev-Config-ETH0-ETH1-.patch | 94 +++++++++++++++++++
+ ...s-r9a09g077m44-dev-Config-ETH2-ETH3-.patch | 77 +++++++++++++++
+ .../linux/linux-renesas_5.10.bbappend         | 11 +++
+ 5 files changed, 279 insertions(+)
+ create mode 100644 meta-rzt2h/recipes-bsp/u-boot/u-boot/0001-board-renesas-rzt2h-dev-Config-100-mbps-Ethernet-for.patch
+ create mode 100644 meta-rzt2h/recipes-kernel/linux/linux-renesas/0001-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH0-ETH1-.patch
+ create mode 100644 meta-rzt2h/recipes-kernel/linux/linux-renesas/0002-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH2-ETH3-.patch
+
+diff --git a/meta-rzt2h/recipes-bsp/u-boot/u-boot/0001-board-renesas-rzt2h-dev-Config-100-mbps-Ethernet-for.patch b/meta-rzt2h/recipes-bsp/u-boot/u-boot/0001-board-renesas-rzt2h-dev-Config-100-mbps-Ethernet-for.patch
+new file mode 100644
+index 00000000..73a8486f
+--- /dev/null
++++ b/meta-rzt2h/recipes-bsp/u-boot/u-boot/0001-board-renesas-rzt2h-dev-Config-100-mbps-Ethernet-for.patch
+@@ -0,0 +1,89 @@
++From 38d826afb137a5b4e05d698e56673c880ea2e3d8 Mon Sep 17 00:00:00 2001
++From: Long Luu <long.luu.ur@renesas.com>
++Date: Wed, 26 Mar 2025 11:33:51 +0700
++Subject: [PATCH] board: renesas: rzt2h-dev: Config 100 mbps Ethernet for ETH2,
++ ETH3 ports on RZ/T2H boards
++
++This patch config 100 mbps Ethernet for ETH2, ETH3 ports
++on RZ/T2H boards.
++
++Signed-off-by: Long Luu <long.luu.ur@renesas.com>
++---
++ arch/arm/dts/rzt2h-dev.dts          | 10 ++++++----
++ board/renesas/rzt2h-dev/rzt2h-dev.c | 10 +++++-----
++ 2 files changed, 11 insertions(+), 9 deletions(-)
++
++diff --git a/arch/arm/dts/rzt2h-dev.dts b/arch/arm/dts/rzt2h-dev.dts
++index ba420caf24..eb1a28b1d3 100644
++--- a/arch/arm/dts/rzt2h-dev.dts
+++++ b/arch/arm/dts/rzt2h-dev.dts
++@@ -80,7 +80,8 @@
++ 
++ &gmac1 {
++ 	phy-handle = <&phy3>;
++-	phy-mode = "rgmii-id";
+++	phy-mode = "mii";
+++	max-speed = <100>;
++ 	status = "okay";
++ 
++ 	mdio {
++@@ -88,7 +89,7 @@
++ 		#size-cells = <0>;
++ 		phy3: ethernet-phy@3 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "rgmii-id";
+++			phy-mode = "mii";
++ 			reg = <3>;
++ 		};
++ 	};
++@@ -96,7 +97,8 @@
++ 
++ &gmac2 {
++ 	phy-handle = <&phy2>;
++-	phy-mode = "rgmii-id";
+++	phy-mode = "mii";
+++	max-speed = <100>;
++ 	status = "okay";
++ 
++ 	mdio {
++@@ -104,7 +106,7 @@
++ 		#size-cells = <0>;
++ 		phy2: ethernet-phy@2 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "rgmii-id";
+++			phy-mode = "mii";
++ 			reg = <2>;
++ 		};
++ 	};
++diff --git a/board/renesas/rzt2h-dev/rzt2h-dev.c b/board/renesas/rzt2h-dev/rzt2h-dev.c
++index a6e4d9d159..968e225f61 100644
++--- a/board/renesas/rzt2h-dev/rzt2h-dev.c
+++++ b/board/renesas/rzt2h-dev/rzt2h-dev.c
++@@ -334,19 +334,19 @@ int board_init(void)
++ 	/* ETHSS: Mode Control 0x6, GMAC1 on port ETH3, GMAC2 on port ETH2 */
++ 	ethss_init_hw(0x6);
++ 
++-	/* ETHSS: GMAC1 RGMII_ID mode on port ETH3 */
++-	ret = ethss_config(3, PHY_INTERFACE_MODE_RGMII_ID);
+++	/* ETHSS: GMAC1 MII mode on port ETH3 */
+++	ret = ethss_config(3, PHY_INTERFACE_MODE_MII);
++ 	if (ret < 0)
++ 		return ret;
++ 	/* Set up speed for Converters for GMAC1 */
++-	ethss_link_up(3, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+++	ethss_link_up(3, PHY_INTERFACE_MODE_MII, SPEED_100, DUPLEX_FULL);
++ 
++ 	/* ETHSS: GMAC2 MII mode on port ETH2 */
++-	ret = ethss_config(2, PHY_INTERFACE_MODE_RGMII_ID);
+++	ret = ethss_config(2, PHY_INTERFACE_MODE_MII);
++ 	if (ret < 0)
++ 		return ret;
++ 	/* Set up speed for Converters for GMAC2 */
++-	ethss_link_up(2, PHY_INTERFACE_MODE_RGMII_ID, SPEED_1000, DUPLEX_FULL);
+++	ethss_link_up(2, PHY_INTERFACE_MODE_MII, SPEED_100, DUPLEX_FULL);
++ 
++ 	board_usb_init();
++ 
++-- 
++2.25.1
++
+diff --git a/meta-rzt2h/recipes-bsp/u-boot/u-boot_2021.10.bbappend b/meta-rzt2h/recipes-bsp/u-boot/u-boot_2021.10.bbappend
+index dc9ee980..7c5a9329 100644
+--- a/meta-rzt2h/recipes-bsp/u-boot/u-boot_2021.10.bbappend
++++ b/meta-rzt2h/recipes-bsp/u-boot/u-boot_2021.10.bbappend
+@@ -1,5 +1,13 @@
+ SYSROOT_DIRS_append = " /boot"
+ 
++FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
++
++SRC_URI_append_rzt2h = " \
++	${@bb.utils.contains('MACHINE_FEATURES', 'eth23_mii', ' \
++	file://0001-board-renesas-rzt2h-dev-Config-100-mbps-Ethernet-for.patch \
++	', '', d)} \
++"
++
+ UBOOT_URI ?= "git://github.com/renesas-rz/renesas-u-boot-cip.git;protocol=https"
+ UBOOT_BRANCH ?= "v2021.10/rzt2h"
+ UBOOT_REV ?= "0adf5cb2dbbe47d304f7276aa4000b1cc4575fe7"
+diff --git a/meta-rzt2h/recipes-kernel/linux/linux-renesas/0001-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH0-ETH1-.patch b/meta-rzt2h/recipes-kernel/linux/linux-renesas/0001-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH0-ETH1-.patch
+new file mode 100644
+index 00000000..9d520fde
+--- /dev/null
++++ b/meta-rzt2h/recipes-kernel/linux/linux-renesas/0001-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH0-ETH1-.patch
+@@ -0,0 +1,94 @@
++From a157f463a417f580fe3894ec58aecb29504177a2 Mon Sep 17 00:00:00 2001
++From: Long Luu <long.luu.ur@renesas.com>
++Date: Wed, 26 Mar 2025 11:46:01 +0700
++Subject: [PATCH 1/2] arm64: dts: renesas: r9a09g077m44-dev: Config ETH0, ETH1
++ ports to RGMII mode
++
++This patch change ETH0, ETH1 ports to RGMII mode.
++
++Signed-off-by: Long Luu <long.luu.ur@renesas.com>
++---
++ .../boot/dts/renesas/r9a09g077m44-dev.dts     | 20 ++++++++-----------
++ 1 file changed, 8 insertions(+), 12 deletions(-)
++
++diff --git a/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts b/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts
++index bd14d0b173a5..1c03b48925b4 100644
++--- a/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts
+++++ b/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts
++@@ -912,8 +912,7 @@ mdio {
++ 
++ 		phy0: ethernet-phy@0 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "mii";
++-			max-speed = <100>;
+++			phy-mode = "rgmii-id";
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -922,8 +921,7 @@ phy0: ethernet-phy@0 {
++ 
++ 		phy1: ethernet-phy@1 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "mii";
++-			max-speed = <100>;
+++			phy-mode = "rgmii-id";
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -935,14 +933,14 @@ phy1: ethernet-phy@1 {
++ 
++ &switch_port0 {
++ 	label = "lan0";
++-	phy-mode = "mii";
+++	phy-mode = "rgmii-id";
++ 	phy-handle = <&phy0>;
++ 	status = "okay";
++ };
++ 
++ &switch_port1 {
++ 	label = "lan1";
++-	phy-mode = "mii";
+++	phy-mode = "rgmii-id";
++ 	phy-handle = <&phy1>;
++ 	status = "okay";
++ };
++@@ -966,8 +964,7 @@ mdio {
++ 
++ 		phy0: ethernet-phy@0 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "mii";
++-			max-speed = <100>;
+++			phy-mode = "rgmii-id";
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -976,8 +973,7 @@ phy0: ethernet-phy@0 {
++ 
++ 		phy1: ethernet-phy@1 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "mii";
++-			max-speed = <100>;
+++			phy-mode = "rgmii-id";
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -1008,14 +1004,14 @@ led_dipsw_device {
++ 
++ &esc_port0 {
++ 	label = "esc0";
++-	phy-mode = "mii";
+++	phy-mode = "rgmii-id";
++ 	phy-handle = <&phy0>;
++ 	status = "okay";
++ };
++ 
++ &esc_port1 {
++ 	label = "esc1";
++-	phy-mode = "mii";
+++	phy-mode = "rgmii-id";
++ 	phy-handle = <&phy1>;
++ 	status = "okay";
++ };
++-- 
++2.25.1
++
+diff --git a/meta-rzt2h/recipes-kernel/linux/linux-renesas/0002-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH2-ETH3-.patch b/meta-rzt2h/recipes-kernel/linux/linux-renesas/0002-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH2-ETH3-.patch
+new file mode 100644
+index 00000000..ac359700
+--- /dev/null
++++ b/meta-rzt2h/recipes-kernel/linux/linux-renesas/0002-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH2-ETH3-.patch
+@@ -0,0 +1,77 @@
++From 2c577f4e4fc2b57fd6b6a7ba32cef3dac3b31957 Mon Sep 17 00:00:00 2001
++From: Long Luu <long.luu.ur@renesas.com>
++Date: Wed, 26 Mar 2025 11:52:03 +0700
++Subject: [PATCH 2/2] arm64: dts: renesas: r9a09g077m44-dev: Config ETH2, ETH3
++ ports to MII mode
++
++This patch change ETH2, ETH3 ports to MII mode.
++
++Signed-off-by: Long Luu <long.luu.ur@renesas.com>
++---
++ arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts | 15 +++++++++------
++ 1 file changed, 9 insertions(+), 6 deletions(-)
++
++diff --git a/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts b/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts
++index 1c03b48925b4..6ec031a55904 100644
++--- a/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts
+++++ b/arch/arm64/boot/dts/renesas/r9a09g077m44-dev.dts
++@@ -805,7 +805,8 @@ fixed-link {
++ #if (SEL_ETHSS_PCIE)
++ &gmac1 {
++ 	phy-handle = <&phy3>;
++-	phy-mode = "rgmii-id";
+++	phy-mode = "mii";
+++	max-speed = <100>;
++ 	pcs-handle = <&mii_conv3>;
++ 	status = "okay";
++ 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(32, 3) GPIO_ACTIVE_HIGH>;
++@@ -822,7 +823,7 @@ mdio {
++ 		#size-cells = <0>;
++ 		phy3: ethernet-phy@3 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "rgmii-id";
+++			phy-mode = "mii";
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -835,7 +836,8 @@ phy3: ethernet-phy@3 {
++ #if ((SEL_RSPI_ETHSS) && (!SEL_ESC_ETHSW_GMAC2))
++ &gmac2 {
++ 	phy-handle = <&phy2>;
++-	phy-mode = "rgmii-id";
+++	phy-mode = "mii";
+++	max-speed = <100>;
++ 	pcs-handle = <&mii_conv2>;
++ 	status = "okay";
++ 	phy-reset-gpios = <&pinctrl RZT2H_GPIO(17, 5) GPIO_ACTIVE_HIGH>;
++@@ -852,7 +854,7 @@ mdio {
++ 		#size-cells = <0>;
++ 		phy2: ethernet-phy@2 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "rgmii-id";
+++			phy-mode = "mii";
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -982,7 +984,8 @@ phy1: ethernet-phy@1 {
++ 
++ 		phy2: ethernet-phy@2 {
++ 			compatible = "ethernet-phy-id0007.0772";
++-			phy-mode = "rgmii-id";
+++			phy-mode = "mii";
+++			max-speed = <100>;
++ 			vsc8531,led-0-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-mode = <VSC8531_LINK_ACTIVITY>;
++ 			vsc8531,led-1-combine-disable;
++@@ -1018,7 +1021,7 @@ &esc_port1 {
++ 
++ &esc_port2 {
++ 	label = "esc2";
++-	phy-mode = "rgmii-id";
+++	phy-mode = "mii";
++ 	phy-handle = <&phy2>;
++ 	status = "okay";
++ };
++-- 
++2.25.1
++
+diff --git a/meta-rzt2h/recipes-kernel/linux/linux-renesas_5.10.bbappend b/meta-rzt2h/recipes-kernel/linux/linux-renesas_5.10.bbappend
+index a65b31b5..17b577d2 100644
+--- a/meta-rzt2h/recipes-kernel/linux/linux-renesas_5.10.bbappend
++++ b/meta-rzt2h/recipes-kernel/linux/linux-renesas_5.10.bbappend
+@@ -1,5 +1,16 @@
+ COMPATIBLE_MACHINE_rzt2h = "(rzt2h-dev|rzn2h-dev)"
+ 
++FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
++
++SRC_URI_append_rzt2h = " \
++	${@bb.utils.contains('MACHINE_FEATURES', 'eth01_rgmii', ' \
++		file://0001-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH0-ETH1-.patch \
++	', '', d)} \
++	${@bb.utils.contains('MACHINE_FEATURES', 'eth23_mii', ' \
++		file://0002-arm64-dts-renesas-r9a09g077m44-dev-Config-ETH2-ETH3-.patch \
++	', '', d)} \
++"
++
+ LINUX_VERSION = "${@oe.utils.conditional("IS_RT_BSP", "1", "5.10.145-cip17-rt7", "5.10.145-cip17",d)}"
+ 
+ KERNEL_URI ?= "git://github.com/renesas-rz/rz_linux-cip.git;protocol=https"
+-- 
+2.25.1
+
