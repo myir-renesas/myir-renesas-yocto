@@ -6,3 +6,5 @@ You can now run 'bitbake <target>'
 Targets are:
     core-image-minimal
     core-image-bsp
+    core-image-qt
+    myir-image-full
