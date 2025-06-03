@@ -27,7 +27,8 @@ SRC_URI_append = "\
   file://touch.cfg \
 "
 
-KBUILD_DEFCONFIG = "defconfig"
+#KBUILD_DEFCONFIG = "defconfig"
+KBUILD_DEFCONFIG = "myb_yt2hx_defconfig"
 KBUILD_DEFCONFIG_rzfive = "renesas_defconfig"
 KCONFIG_MODE = "alldefconfig"
 
