@@ -51,7 +51,7 @@ PACKAGECONFIG_CONFARGS_append += "\
 "
 
 # add necessary packages
-PACKAGECONFIG_append += " sm linuxfb gles2"
+PACKAGECONFIG_append += " sm linuxfb gles2 tslib cups"
 
 # nis option is not supported anymore, disable it here
 PACKAGECONFIG[nis] = ""
