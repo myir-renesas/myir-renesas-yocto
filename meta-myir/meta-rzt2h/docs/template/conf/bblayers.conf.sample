@@ -10,9 +10,12 @@ BBLAYERS ?= " \
   ${TOPDIR}/../poky/meta \
   ${TOPDIR}/../poky/meta-poky \
   ${TOPDIR}/../poky/meta-yocto-bsp \
-  ${TOPDIR}/../meta-renesas/meta-rz-common \
-  ${TOPDIR}/../meta-renesas/meta-rzt2h \
+  ${TOPDIR}/../meta-myir/meta-rz-common \
+  ${TOPDIR}/../meta-myir/meta-rzt2h \
   ${TOPDIR}/../meta-openembedded/meta-oe \
   ${TOPDIR}/../meta-openembedded/meta-python \
   ${TOPDIR}/../meta-openembedded/meta-multimedia \
+  ${TOPDIR}/../meta-qt5 \
+  ${TOPDIR}/../meta-rz-features/meta-rz-demos \
+  ${TOPDIR}/../meta-rz-multi-os \
   "
