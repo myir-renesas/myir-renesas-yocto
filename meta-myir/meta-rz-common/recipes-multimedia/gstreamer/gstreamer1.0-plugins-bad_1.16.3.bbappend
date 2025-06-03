@@ -21,7 +21,7 @@ SRC_URI_append_rzg2l = " \
 
 SRCREV_base = "3ef17d3c57e12f9d7536e464656b871a8949fa5b"
 
-DEPENDS += "weston virtual/libgles2 mmngr-user-module mmngrbuf-user-module"
+DEPENDS += "virtual/libgles2 mmngr-user-module mmngrbuf-user-module"
 DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'bayer2raw', bb.utils.contains('BBFILE_COLLECTIONS', 'rz-graphics', 'bayer2raw', '', d), '', d)}"
 
 

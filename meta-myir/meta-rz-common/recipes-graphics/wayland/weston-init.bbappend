@@ -22,6 +22,7 @@ do_install_append() {
 
 	# Fix weston.service and weston@.service run simultaneously.
 	mv ${D}/${sysconfdir}/init.d/weston ${D}/${sysconfdir}/init.d/weston@
+        mv ${D}${bindir}/weston-start ${D}${bindir}/weston-start-no
 }
 
 FILES_${PN}_append = " \
