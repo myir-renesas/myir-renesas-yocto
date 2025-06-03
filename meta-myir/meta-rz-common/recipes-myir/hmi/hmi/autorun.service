@@ -1,0 +1,11 @@
+[Unit]
+Description=auto run script after psplash-quit service
+After=multi-user.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/autorun.sh
+
+
+[Install]
+WantedBy=multi-user.target
