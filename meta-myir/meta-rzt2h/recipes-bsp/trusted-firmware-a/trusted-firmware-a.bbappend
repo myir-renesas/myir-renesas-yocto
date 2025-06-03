@@ -1,4 +1,4 @@
-COMPATIBLE_MACHINE_rzt2h = "(rzt2h-dev|rzn2h-dev)"
+COMPATIBLE_MACHINE_rzt2h = "(rzt2h-dev|rzn2h-dev|myd-yt2h)"
 
 DEPENDS_append = " u-boot"
 
@@ -10,10 +10,13 @@ PV = "v2.7+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-TFA_URI ?= "git://github.com/renesas-rz/rzg_trusted-firmware-a.git;protocol=https"
-TFA_REV ?= "deb68e75b6b73414317cd5b773470c033917e3e2"
+#TFA_URI ?= "git://github.com/renesas-rz/rzg_trusted-firmware-a.git;protocol=https"
+TFA_URI ?= "git://gitee.com/renesas_1/myir-renesas-atf.git;protocol=https"
+#TFA_REV ?= "deb68e75b6b73414317cd5b773470c033917e3e2"
+TFA_BRANCH ?= "develop_v2.7"
+TFA_REV ?= "e0876e9a2a02a3b8e83e0e6ae2ab797e9b04487f"
 
-SRC_URI = "${TFA_URI};nobranch=1"
+SRC_URI = "${TFA_URI};branch=${TFA_BRANCH}"
 SRCREV = "${TFA_REV}"
 
 PLATFORM_rzt2h = "t2h"
