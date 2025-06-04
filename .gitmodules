@@ -1,0 +1,3 @@
+[submodule "meta-qt5"]
+	path = meta-qt5
+	url = https://migit.goho.co/myir-yt2hx-linux/meta-qt5.git
