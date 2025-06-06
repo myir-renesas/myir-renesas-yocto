@@ -15,6 +15,8 @@ BBLAYERS ?= " \
   ${TOPDIR}/../meta-openembedded/meta-oe \
   ${TOPDIR}/../meta-openembedded/meta-python \
   ${TOPDIR}/../meta-openembedded/meta-multimedia \
+  ${TOPDIR}/../meta-openembedded/meta-networking \
+  ${TOPDIR}/../meta-openembedded/meta-initramfs \
   ${TOPDIR}/../meta-qt5 \
   ${TOPDIR}/../meta-rz-features/meta-rz-demos \
   ${TOPDIR}/../meta-rz-multi-os \
