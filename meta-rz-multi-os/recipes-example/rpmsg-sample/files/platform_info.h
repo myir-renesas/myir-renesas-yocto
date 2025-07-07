@@ -86,8 +86,8 @@
 // Macro used for translating addr from CR to CA
 #if (RPMSG_REMOTE_CORE == 0)
 #define ADDRESS_CR_DDR_BASE     (0xE0000000)
-#define ADDRESS_CR_DDR_SIZE     (0x3FFFFFFFF)
-#define ADDRESS_CA_DDR_BASE     (0x300000000)
+#define ADDRESS_CR_DDR_SIZE     (0x27FFFFFFF)
+#define ADDRESS_CA_DDR_BASE     (0x180000000)
 #elif (RPMSG_REMOTE_CORE == 1)	
 #define ADDRESS_CR_DDR_BASE     (0xC0000000)
 #define ADDRESS_CR_DDR_SIZE     (0x2FFFFFFF)
