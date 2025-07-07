@@ -7,8 +7,8 @@ SRC_URI += " \
 		file://etc/hostapd.conf \
 		file://etc/udhcpd.conf \
  		file://usr/bin/ \
-		file://10-static-eth0.network \
 		file://11-static-eth1.network \
+		file://12-static-eth2.network \
 		file://LICENSE \
 "
 S="${WORKDIR}"
