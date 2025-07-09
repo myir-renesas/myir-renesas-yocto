@@ -1,7 +1,9 @@
-#require recipes-graphics/images/core-image-weston.bb
+require recipes-graphics/images/core-image-weston.bb
 require include/core-image-renesas-base.inc
 require include/core-image-renesas-mmp.inc
 require include/core-image-bsp.inc
+
+
 SUMMARY = "Renesas core image with Qt5 platform support base on core-image-weston"
 
 IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
@@ -10,9 +12,9 @@ inherit core-image features_check
 
 WHITELIST_GPL-3.0 += "gnutls-locale-zh-cn libidn2-locale-zh-cn"
 GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
-#IMAGE_LINGUAS = "zh-cn"
+IMAGE_LINGUAS = "zh-cn"
 
-IMAGE_INSTALL_append = " packagegroup-qt5-myir "
+IMAGE_INSTALL_append = " packagegroup-qt5-myir"
 IMAGE_INSTALL_append = " ${@oe.utils.conditional("QT_DEMO", "1", " \
 			        kernel-module-uvcvideo \
 			        qt5-launch-demo \
@@ -24,27 +26,28 @@ IMAGE_INSTALL_append = " ${@oe.utils.conditional("QT_DEMO", "1", " \
 			        qt5ledscreen \
 			        quitbattery \
 			        quitindicators \
+			        qtwebkit-examples-examples \
 			        qtdemo-extrafiles \
 				", "", d)}"
+
 IMAGE_INSTALL_append = " \
-	qtquickcontrols2 \
-	tcpdump \
-	vim \
-	ncurses \
-	readline \
-	evtest \
-	python3-pip \
-	sqlite3 \
-	libmodbus \
-	udev-extraconf \
-	serialcheck \
-	ppp \
-	valgrind \
-	mmc-utils \
-	hmi \
-	tzdata \
-	myir-tool \
-	fw-config \
+        qtquickcontrols2 \
+        tcpdump \
+        vim \
+        ncurses \
+        readline \
+        evtest \
+        python3-pip \
+        sqlite3 \
+        libmodbus \
+        udev-extraconf \
+        serialcheck \
+        ppp \
+        valgrind \
+        mmc-utils \
+        hmi \
+        tzdata \
+        myir-tool \
 "
 
 ### For cross-compile Qt ###
@@ -55,9 +58,9 @@ IMAGE_FEATURES += " \
     tools-debug debug-tweaks \
 "
 
-#TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex nativesdk-python3-pycryptodome nativesdk-python3-pycryptodomex "
+TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex nativesdk-python3-pycryptodome nativesdk-python3-pycryptodomex "
 
-#TOOLCHAIN_HOST_TASK_append = " nativesdk-qtbase-tools nativesdk-qtwayland-tools "
+TOOLCHAIN_HOST_TASK_append = " nativesdk-qtbase-tools nativesdk-qtwayland-tools "
 
 FEATURE_PACKAGES_tools-sdk += " packagegroup-qt5-toolchain-target kernel-devsrc "
 

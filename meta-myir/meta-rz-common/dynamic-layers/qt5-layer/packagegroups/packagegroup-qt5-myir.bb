@@ -29,7 +29,6 @@ RDEPENDS_${PN} += " \
 	qtbase \
 	qtbase-plugins \
 	qtbase-tools \
-	qtbase-fonts \
 	${@bb.utils.contains("DISTRO_FEATURES", "wayland", "${QT5_WAYLAND_PACKAGES}", "", d)} \
 	qtdeclarative \
 	qtdeclarative-plugins \
@@ -39,9 +38,6 @@ RDEPENDS_${PN} += " \
 	qtgraphicaleffects-qmlplugins \
 	qtconnectivity \
 	qtconnectivity-qmlplugins \
-	qtlocation-plugins-position \
-	qtlocation-qmlplugins-positioning \
-	qtlocation-positioning \
 	qtsvg \
 	qtsvg-plugins \
 	qtsensors \
@@ -49,7 +45,6 @@ RDEPENDS_${PN} += " \
 	qtsensors-qmlplugins \
 	qtscript \
 	qtserialport \
-	qt5-qml-presentation-system \
 	qtquickcontrols2 \
 	qtquickcontrols \
 "
