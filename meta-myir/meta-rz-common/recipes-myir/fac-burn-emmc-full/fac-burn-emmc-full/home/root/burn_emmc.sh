@@ -110,7 +110,6 @@ emmc_partition()
 {
 
         umount /dev/mmcblk0p1 > /dev/null 2>&1
-        umount /dev/mmcblk0p2 > /dev/null 2>&1
       dd if=/dev/zero of=/dev/mmcblk0 bs=1024 count=1024
         if [ $? -ne 0 ]; then
                 echo "===> Format emmc failed"
@@ -129,8 +128,7 @@ emmc_partition()
 #        } | sfdisk -u S /dev/mmcblk1 >/dev/null 2>&1
 
 sfdisk -u S /dev/mmcblk0 <<EOF                                       
-    1M,151M,c                       
-    152M,,83                                
+    10M,,83                       
 EOF
         if [ $? -ne 0 ]; then
                 echo "===> eMMC partition failed"
@@ -139,21 +137,21 @@ EOF
         fi
 
 
+      #  umount /dev/mmcblk0p1 > /dev/null 2>&1
+      #  sleep 1
+      #  mkfs.vfat /dev/mmcblk0p1 <<EOF                                                                              
+#y                                                                            
+#EOF                                             
+#        if [ $? -ne 0 ]; then
+#                echo "===> Creating boot partition failed"
+#                update_fail $1 $2
+#                exit 1
+#        fi
+
+
         umount /dev/mmcblk0p1 > /dev/null 2>&1
         sleep 1
-        mkfs.vfat /dev/mmcblk0p1 <<EOF                                                                              
-y                                                                            
-EOF                                             
-        if [ $? -ne 0 ]; then
-                echo "===> Creating boot partition failed"
-                update_fail $1 $2
-                exit 1
-        fi
-
-
-        umount /dev/mmcblk0p2 > /dev/null 2>&1
-        sleep 1
-        mkfs.ext4 -L "rootfs" /dev/mmcblk0p2 <<EOF                              
+        mkfs.ext4 -L "rootfs" /dev/mmcblk0p1 <<EOF                              
 y                                                                      
 EOF
         if [ $? -ne 0 ]; then
@@ -161,13 +159,13 @@ EOF
                 update_fail $1 $2
                 exit 1
         fi
-        mkfs.ext4 -L "rootfs" /dev/mmcblk0p2 <<EOF                  
+        mkfs.ext4 -L "rootfs" /dev/mmcblk0p1 <<EOF                  
 y                                                                   
 EOF
-        mkdir -p /home/root/boot  > /dev/null 2>&1
-        mount /dev/mmcblk0p1 /home/root/boot  > /dev/null 2>&1
+        #mkdir -p /home/root/boot  > /dev/null 2>&1
+        #mount /dev/mmcblk0p1 /home/root/boot  > /dev/null 2>&1
         mkdir -p /home/root/rootfs  > /dev/null 2>&1
-        mount -t ext4 /dev/mmcblk0p2 /home/root/rootfs > /dev/null 2>&1
+        mount -t ext4 /dev/mmcblk0p1 /home/root/rootfs > /dev/null 2>&1
 }
 
 mksdcard(){
@@ -209,6 +207,8 @@ burn_bootloader(){
 
     umount /run/media/* > /dev/null 2>&1
     umount /dev/mmcblk0p1/ > /dev/null 2>&1
+    mkdir -p /home/root/boot
+    mount -t vfat /dev/mmcblk0p1 /home/root/boot
     cp ${BOOTLOADER_DIR}/* /home/root/boot
     cmd_check $? "burn kernel dtb faild"
     sync
@@ -237,7 +237,7 @@ check_rootfs(){
 
     if [ x"$rootfs_hostname" != x"$HOSTNAME" ];then
        echo_fun "not equal"
-       reboot
+     #  reboot
     else
        echo_fun "equal"
     fi
@@ -249,8 +249,8 @@ burn_start_ing &
 umount /run/media/* > /dev/null 2>&1
 echo_fun "start format mmc "
 emmc_partition
-echo_fun "start burn bootloader"
-burn_bootloader
+#echo_fun "start burn bootloader"
+#burn_bootloader
 echo_fun "start burn rootfs "
 burn_rootfs_ext4
 check_rootfs
