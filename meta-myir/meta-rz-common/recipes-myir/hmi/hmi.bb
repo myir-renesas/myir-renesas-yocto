@@ -12,6 +12,7 @@ inherit  systemd
 S = "${WORKDIR}"
 
 SRC_URI = "file://usr/bin/motor_control_simulator \
+	   file://usr/bin/mxapp2 \
 	   file://usr/bin/autorun.sh \
            file://autorun.service \
            file://msyh.ttc \
@@ -21,6 +22,7 @@ SRC_URI = "file://usr/bin/motor_control_simulator \
            file://usr/share/myir/Video/ \
            file://usr/share/myir/Music/ \
            file://usr/share/myir/Capture/ \
+           file://usr/share/zh_CN \
 	   file://COPYING.MIT \
           "
 
@@ -34,6 +36,7 @@ do_install(){
         install -d ${D}${bindir}
 	install -d ${D}/usr/lib64/fonts/
 	install -d ${D}/usr/share/fonts/ttf/
+	install -d ${D}/usr/lib/locale
 
         install -m 755 ${WORKDIR}/autorun.service ${D}${systemd_system_unitdir}/autorun.service
 
@@ -47,12 +50,14 @@ do_install(){
         install -m 755 ${WORKDIR}${datadir}/myir/Video/* ${D}${datadir}/myir/Video
         install -m 755 ${WORKDIR}${datadir}/myir/Music/* ${D}${datadir}/myir/Music
         install -m 755 ${WORKDIR}${datadir}/myir/Capture/* ${D}${datadir}/myir/Capture
+	cp -r ${WORKDIR}${datadir}/zh_CN ${D}/usr/lib/locale
  
 }
 
 
 FILES_${PN} = "/usr/bin/autorun.sh \
 	       /usr/bin/motor_control_simulator \
+	       /usr/bin/mxapp2 \
 	      /usr/lib64/fonts/msyh.ttc \
 	      ${datadir}/myir \
               ${datadir}/myir/Video \
@@ -61,6 +66,7 @@ FILES_${PN} = "/usr/bin/autorun.sh \
   	     /usr/share/fonts \
              /usr/share/fonts/ttf \
             /usr/share/fonts/ttf/msyh.ttc \
+	    /usr/lib/locale \
 	"
 
 INSANE_SKIP_${PN} = "file-rdeps"
