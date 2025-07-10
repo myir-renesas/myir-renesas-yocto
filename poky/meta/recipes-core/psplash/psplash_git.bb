@@ -17,7 +17,8 @@ SRC_URI = "git://git.yoctoproject.org/${BPN};branch=master \
            ${SPLASH_IMAGES}"
 UPSTREAM_CHECK_COMMITS = "1"
 
-SPLASH_IMAGES = "file://psplash-poky-img.h;outsuffix=default"
+#SPLASH_IMAGES = "file://psplash-poky-img.h;outsuffix=default"
+SPLASH_IMAGES = "file://logo-img.h;outsuffix=default"
 
 python __anonymous() {
     oldpkgs = d.getVar("PACKAGES").split()
