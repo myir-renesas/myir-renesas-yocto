@@ -15,22 +15,23 @@ S="${WORKDIR}"
 
 do_install() {
 
-	#install -d ${D}${bindir}
+	install -d ${D}${bindir}
 	#install -d ${D}/etc/myir_test/
 	#install -d ${D}/etc/
 	install -d ${D}/${sysconfdir}/systemd/network/
 
-	install -m 755 ${S}/10-static-eth0.network  ${D}/${sysconfdir}/systemd/network/
 	install -m 755 ${S}/11-static-eth1.network  ${D}/${sysconfdir}/systemd/network/
+	install -m 755 ${S}/12-static-eth2.network  ${D}/${sysconfdir}/systemd/network/
         #install -m 755 ${S}/etc/myir_test/* ${D}/etc/myir_test/ 
         #install -m 755 ${S}/etc/hostapd.conf ${D}/etc/hostapd.conf 
         #install -m 755 ${S}/etc/udhcpd.conf ${D}/etc/udhcpd.conf
-	#install -m 755 ${S}${bindir}/* ${D}/${bindir}/
+	 install -m  755 ${S}${bindir}/* ${D}/${bindir}/
         
 }
 
 FILES_${PN} ="\
 	     ${sysconfdir}/systemd/network/ \
+	     ${bindir} \
 "
 #INSANE_SKIP_${PN} = "ldflags"
 #INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
