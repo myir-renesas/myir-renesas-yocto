@@ -12,7 +12,7 @@ WHITELIST_GPL-3.0 += "gnutls-locale-zh-cn libidn2-locale-zh-cn"
 GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
 IMAGE_LINGUAS = "zh-cn"
 
-IMAGE_FEATURES:remove = "splash"
+#IMAGE_FEATURES_remove = "splash"
 IMAGE_INSTALL_append = " packagegroup-qt5-myir "
 IMAGE_INSTALL_append = " ${@oe.utils.conditional("QT_DEMO", "1", " \
 			        kernel-module-uvcvideo \
@@ -47,6 +47,7 @@ IMAGE_INSTALL_append = " \
 	myir-tool \
 	fw-config \
 "
+IMAGE_INSTALL_remove = "connman"
 
 ### For cross-compile Qt ###
 inherit populate_sdk_qt5

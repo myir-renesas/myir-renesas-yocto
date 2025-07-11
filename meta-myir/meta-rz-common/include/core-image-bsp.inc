@@ -47,13 +47,20 @@ IMAGE_INSTALL_append_rzg2h = " \
 "
 
 # Additional tools for support Tool develop
+#IMAGE_INSTALL_append = " \
+#    ckermit \
+#    connman \
+#    connman-client \
+#    connman-tools \
+#    connman-tests \
+#    connman-wait-online \
+#    lttng-modules \
+#    lttng-tools \
+#    lttng-ust \
+#    tcf-agent \
+#"
 IMAGE_INSTALL_append = " \
     ckermit \
-    connman \
-    connman-client \
-    connman-tools \
-    connman-tests \
-    connman-wait-online \
     lttng-modules \
     lttng-tools \
     lttng-ust \
