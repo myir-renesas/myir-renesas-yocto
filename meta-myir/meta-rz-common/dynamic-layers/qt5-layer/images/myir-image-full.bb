@@ -29,6 +29,8 @@ IMAGE_INSTALL_append = " ${@oe.utils.conditional("QT_DEMO", "1", " \
 				", "", d)}"
 IMAGE_INSTALL_append = " \
 	qtquickcontrols2 \
+	qtvirtualkeyboard \
+	qttools-plugins \
 	tcpdump \
 	vim \
 	ncurses \
