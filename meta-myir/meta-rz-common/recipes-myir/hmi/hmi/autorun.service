@@ -1,6 +1,6 @@
 [Unit]
 Description=auto run script after psplash-quit service
-After=multi-user.target
+After=getty.target multi-user.target weston@root.service
 
 [Service]
 Type=forking
