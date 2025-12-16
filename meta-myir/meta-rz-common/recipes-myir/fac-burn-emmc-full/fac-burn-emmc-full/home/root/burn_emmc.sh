@@ -1,35 +1,46 @@
 #!/bin/sh
-PART=0
-EMMC_NODE=/dev/mmcblk${PART}
 
-RCW_FILE=/home/root/mfgimage/bl2_emmc.pbl
-UBOOT_FILE=/home/root/mfgimage/fip_uboot.bin
-KERNEL_DTB_DIR=/home/root/mfgimage/kernel_dtb
-KERNEL_DTB=/home/root/mfgimage/myb-yt2hx-display.dtb
-ROOTFS_FILE_EXT2=/home/root/mfgimage/myir-image-full-myd-yt2h.tar.gz
-DP_FIRMWARE=/home/root/mfgimage/ls1028a-dp-fw.bin
-BOOTLOADER_DIR=/home/root/mfgimage/bootloader
+#********************************************************************
+#  copyright (C) 2014 all rights reserved
+#  @file: flash_rensas.sh
+#  @Created: 2025-01-17 16:00
+#  @Author: AlexHu
 
-MYD_J1028_NAME="myd-yt2h"
 
-HOSTNAME=`cat /etc/hostname`
-
-if [ x"$HOSTNAME" == x"$MYD_J1028_NAME" ];then
-        led1=d22
+flag=$1
+if [[ X${flag} = X"plan" ]];then
+plan="{\"step\":\"firmware\",\"PN\":\"xxx\",\"SN\":\"xxx\",\"CN\":\"xxx\",\"plan\":{\"num\":\"3\",\"modules\":{\"uboot\":\"0\", \"image\":\"2000\",\"rootfs\":\"40000\"}}}"
+echo ">>>[${#plan}]${plan}"
+exit 1
 fi
-
-LED_PID=-1
-time=0.2
 
 ECHO_TTY="/dev/ttySC0"
 
+
+## eMMC  ---> mmcblk0
+DRIVE=/dev/mmcblk0
+
+bootpart=""
+rootpart=""
+
+##Get ddr size
+SDDRIV=/dev/mmcblk1
+umount ${SDDRIV}p1
+sleep 1
+mount -t vfat ${SDDRIV}p1 /mnt/
+sleep 1
+
+imagedir=/home/root/t2h_image
+. ${imagedir}/Manifest
+
+BL2_FILE=${imagedir}/${bl2file}
+FIP_FILE=${imagedir}/${fipfile}
+
+IMAGE_FILE=${imagedir}/${imagefile}
+DTBS_FILE=${imagedir}/${dtbfile}
+ROOTFS_FILE=${imagedir}/${rootfsfile}
+
 burn_start_ing(){
-
-
-        if [[ ${no_led} -eq 1 ]];then
-                exit 0;
-        fi
-
     echo "***********************************************" >> ${ECHO_TTY}
     echo "*************    SYSTEM UPDATE    *************" >> ${ECHO_TTY}
     echo "***********************************************" >> ${ECHO_TTY}
@@ -41,221 +52,172 @@ burn_start_ing(){
     echo "                                               " >> ${ECHO_TTY}
     echo "                                               " >> ${ECHO_TTY}
 
-        #核心板上的绿灯闪烁则烧写中
- #       echo 0 > /sys/class/leds/${led1}/brightness
 
+	echo 0 > /sys/class/leds/system_led/brightness
         while [ 1 ]
         do
-#                echo 1 > /sys/class/leds/${led1}/brightness
-                sleep $time
- #               echo 0 > /sys/class/leds/${led1}/brightness
-                sleep $time
-        echo "*************   Updating   *************" >> ${ECHO_TTY}
+                echo 1 > /sys/class/leds/system_led/brightness
+                sleep 0.25
+                echo 0 > /sys/class/leds/system_led/brightness
+                sleep 0.25
+	echo "*************   Updating   *************" >> ${ECHO_TTY}
         done
+	
 }
 
-burn_faild(){
-        echo $'>>>[100]{\"step\":\"firmware\",\"result\":{\"bootloader\":\"2\",\"data\":\"2\",\"kernel\":\"2\",\"rootfs\":\"2\"}}\r\n'
-        if [[ ${no_led} -eq 1 ]];then
-                exit 0;
-        fi
-
-    kill $LED_PID
-       # 熄灭
-        echo 0 > /sys/class/leds/${led1}/brightness
-
-    echo "Update faild..."   >> ${ECHO_TTY}
-    echo "Update faild..."   >> ${ECHO_TTY}
-    echo "Update faild..."   >> ${ECHO_TTY}
-}
-
-burn_succeed(){
-  echo $'>>>[100]{\"step\":\"firmware\",\"result\":{\"bootloader\":\"0\",\"data\":\"0\",\"kernel\":\"0\",\"rootfs\":\"0\"}}\r\n'
-  if [[ ${no_led} -eq 1 ]];then
-                return 0;
-        fi
-
-#    kill $LED_PID
-
-        # 常亮
-#        echo 1 > /sys/class/leds/${led1}/brightness
-
+update_success()
+{
+	echo 1 > /sys/class/leds/system_led/brightness
         echo "***********************************************" >> ${ECHO_TTY}
         echo "********    SYSTEM UPDATE  SUCCEED  ***********" >> ${ECHO_TTY}
-    echo "********    SYSTEM UPDATE  SUCCEED  ***********" >> ${ECHO_TTY}
-    echo "********    SYSTEM UPDATE  SUCCEED  ***********" >> ${ECHO_TTY}
+    	echo "********    SYSTEM UPDATE  SUCCEED  ***********" >> ${ECHO_TTY}
+    	echo "********    SYSTEM UPDATE  SUCCEED  ***********" >> ${ECHO_TTY}
         echo "***********************************************" >> ${ECHO_TTY}
-    echo "***********************************************" >> ${ECHO_TTY}
-    echo "                                               " >> ${ECHO_TTY}
-
+    	echo "***********************************************" >> ${ECHO_TTY}
+    	echo "                                               " >> ${ECHO_TTY}
 }
 
-echo_fun(){
+update_fail()
+{
+	echo 0 > /sys/class/leds/system_led/brightness
         echo "***********************************************" >> ${ECHO_TTY}
-        echo "********    "$1 "  ***********" >> ${ECHO_TTY}
-    echo "***********************************************" >> ${ECHO_TTY}
+        echo "********    SYSTEM UPDATE  FAILED  ***********" >> ${ECHO_TTY}
+        echo "********    SYSTEM UPDATE  FAILED  ***********" >> ${ECHO_TTY}
+        echo "********    SYSTEM UPDATE  FAILED  ***********" >> ${ECHO_TTY}
+        echo "***********************************************" >> ${ECHO_TTY}
+        echo "***********************************************" >> ${ECHO_TTY}
+        echo "                                               " >> ${ECHO_TTY}
 }
+
 cmd_check()
 {
-        if [ $1 -ne 0 ];then
-                echo "$2 failed!"   >> ${ECHO_TTY}
-        echo "$2 failed!"   >> ${ECHO_TTY}
-        echo "$2 failed!"   >> ${ECHO_TTY}
-                burn_faild
-        exit -1
-        fi
+	if [ $1 -ne 0 ];then
+		echo "$2 failed!" >> ${ECHO_TTY}
+		echo
+		update_fail
+	fi
 }
 
-emmc_partition()
+## check_file
+check_file()
 {
-
-        umount /dev/mmcblk0p1 > /dev/null 2>&1
-      dd if=/dev/zero of=/dev/mmcblk0 bs=1024 count=1024
-        if [ $? -ne 0 ]; then
-                echo "===> Format emmc failed"
-                update_fail $1 $2
-                exit 1
-        fi
-        SIZE=`fdisk -l /dev/mmcblk0 | grep Disk | awk '{print $5}'`
-
-        echo DISK SIZE - $SIZE bytes
-
-        CYLINDERS=475 #`echo $SIZE/255/63/512 | bc`
-
-#        {
-#           16M,170M,83
-#           186M,,83
-#        } | sfdisk -u S /dev/mmcblk1 >/dev/null 2>&1
-
-sfdisk -u S /dev/mmcblk0 <<EOF                                       
-    10M,,83                       
-EOF
-        if [ $? -ne 0 ]; then
-                echo "===> eMMC partition failed"
-                update_fail $1 $2
-                exit 1
-        fi
-
-
-      #  umount /dev/mmcblk0p1 > /dev/null 2>&1
-      #  sleep 1
-      #  mkfs.vfat /dev/mmcblk0p1 <<EOF                                                                              
-#y                                                                            
-#EOF                                             
-#        if [ $? -ne 0 ]; then
-#                echo "===> Creating boot partition failed"
-#                update_fail $1 $2
-#                exit 1
-#        fi
-
-
-        umount /dev/mmcblk0p1 > /dev/null 2>&1
-        sleep 1
-        mkfs.ext4 -L "rootfs" /dev/mmcblk0p1 <<EOF                              
-y                                                                      
-EOF
-        if [ $? -ne 0 ]; then
-                echo "===> Creating rootfs partition failed"
-                update_fail $1 $2
-                exit 1
-        fi
-        mkfs.ext4 -L "rootfs" /dev/mmcblk0p1 <<EOF                  
-y                                                                   
-EOF
-        #mkdir -p /home/root/boot  > /dev/null 2>&1
-        #mount /dev/mmcblk0p1 /home/root/boot  > /dev/null 2>&1
-        mkdir -p /home/root/rootfs  > /dev/null 2>&1
-        mount -t ext4 /dev/mmcblk0p1 /home/root/rootfs > /dev/null 2>&1
+	if [ ! -s $1 ];then
+		echo "invalid imagefile $1" >> ${ECHO_TTY}
+		echo
+		update_fail
+	fi
 }
 
-mksdcard(){
-    #partition size in 10M
-    BOOT_ROM_SIZE=16
-    KERNEL_DTB_SIZE=170
+fidsk_emmc(){
 
-    if [   $# -lt 1 ];then
-        echo format node not exist
-        exit 1
+sfdisk --force ${DRIVE} << EOF
+10M,50M,0c
+60M,,83
+EOF
+cmd_check $? "Re-partition device"
+
+
+MAX_TRIES=4
+
+for ((i=1; i<=MAX_TRIES; i++)); do
+    if [ -b "$DRIVE"p2 ]; then
+        echo "[OK] $DEVICE exists (Attempt $i succeeded)" >> ${ECHO_TTY}
+		umount ${DRIVE}p1
+		umount ${DRIVE}p2
+		mkfs.vfat -F 32 -n "boot" ${DRIVE}p1  > /dev/null 2>&1
+		cmd_check $? "Formating boot partition"
+		#mkfs.ext4  ${DRIVE}p2 > /dev/null 2>&1
+		mkfs.ext4 -F -L "rootfs" ${DRIVE}p2 > /dev/null 2>&1
+		cmd_check $? "Formating rootfs partition"
+        break
     else
-        echo exist
+        echo "[WARN] $DEVICE not found (Attempt $i failed)" >> ${ECHO_TTY}
+        sleep 2  # Optional delay
     fi
-    node=$1
-    echo $node
+done
 
-   # dd if=/dev/zero of=${node} bs=1k count=8192
-
-sfdisk --force ${node} <<EOF
-    ${BOOT_ROM_SIZE}M,${KERNEL_DTB_SIZE}M,83
-    $(($KERNEL_DTB_SIZE + 16))M,,83
-EOF
-    while [ 1 ]
-    do
-        if [ -b ${node}p2 ];then
-                break
-        else
-                sleep 0.5
-                echo ${node}p2 not exist
-        fi
-    done
+bootpart=`basename ${DRIVE}p1`
+rootpart=`basename ${DRIVE}p2`
 }
 
-enable_bootpart(){
-    mmc bootpart enable 1 1 /dev/mmcblk${PART}
+erasing_emmc()
+{
+	# Erasing eMMC
+	echo -e "\n== Destroying Master Boot Record (sector 0) ==" >> ${ECHO_TTY}
+	sleep 1
+	echo dd if=/dev/zero of=${DRIVE} bs=512 count=1
+	dd if=/dev/zero of=${DRIVE} bs=512 count=1
+	sync
 }
 
-burn_bootloader(){
-
-    umount /run/media/* > /dev/null 2>&1
-    umount /dev/mmcblk0p1/ > /dev/null 2>&1
-    mkdir -p /home/root/boot
-    mount -t vfat /dev/mmcblk0p1 /home/root/boot
-    cp ${BOOTLOADER_DIR}/* /home/root/boot
-    cmd_check $? "burn kernel dtb faild"
-    sync
-    umount /home/root/boot > /dev/null 2>&1
+burn_boot()
+{
+	echo 0 > /sys/block/mmcblk0boot0/force_ro
+	echo 0 > /sys/block/mmcblk0boot1/force_ro
+	sleep 1
+	dd if=/dev/zero of=/dev/mmcblk0boot0 bs=1M count=10 conv=fsync
+	dd if=/dev/zero of=/dev/mmcblk0boot1 bs=1M count=10 conv=fsync
+	sync
+	dd if=${BL2_FILE} of=/dev/mmcblk0boot0 bs=512 skip=0 seek=1 conv=fsync
+	cmd_check $? "Update bl2 file"
+	dd if=${FIP_FILE} of=/dev/mmcblk0boot0 bs=512 skip=0 seek=768 conv=fsync
+	cmd_check $? "Update fip file"
 }
 
-burn_rootfs_ext4(){
-       umount /run/media/* > /dev/null 2>&1                                                                                                         
-    umount /dev/mmcblk1p2/ > /dev/null 2>&1
+burn_image()
+{
+	mkdir -p /run/media/${bootpart}
+	mount   ${DRIVE}p1   /run/media/${bootpart}
 
-date  042911302026.10
-tar xf ${ROOTFS_FILE_EXT2} -C /home/root/rootfs
-    cmd_check $? "burn root faild"
-    sync
-    umount /run/media/* > /dev/null 2>&1
-    umount /home/root/rootfs > /dev/null 2>&1
+	cp ${IMAGE_FILE} /run/media/${bootpart}
+	cmd_check $? "Update kernel"
+	cp ${DTBS_FILE} /run/media/${bootpart}
+	cmd_check $? "Update dtb"
+	sync
 }
 
-check_rootfs(){
-    mkdir -p /mnt/mmcblk${PART}p2
-    mount /dev/mmcblk${PART}p2 /mnt/ > /dev/null 2>&1
-    cp ${KERNEL_DTB} /mnt/boot -f
-    sync
-    rootfs_hostname=`cat /mnt/etc/hostname`
-    echo_fun "rootfs_hostname:$rootfs_hostname"
+burn_rootfs()
+{
+	## ormat: ext4
+	dd if=${ROOTFS_FILE} of=${DRIVE}p2 bs=1M
+	cmd_check $? "Update rootfs"
+	sync
+}
 
-    if [ x"$rootfs_hostname" != x"$HOSTNAME" ];then
-       echo_fun "not equal"
-     #  reboot
-    else
-       echo_fun "equal"
-    fi
-    umount /mnt/ > /dev/null 2>&1
+resize2fs_emmc()
+{
+	e2fsck -f  ${DRIVE}p2
+   yes | resize2fs   ${DRIVE}p2
+  	sync
 }
 
 burn_start_ing &
-#LED_PID=$!
-umount /run/media/* > /dev/null 2>&1
-echo_fun "start format mmc "
-emmc_partition
-#echo_fun "start burn bootloader"
-#burn_bootloader
-echo_fun "start burn rootfs "
-burn_rootfs_ext4
-check_rootfs
-burn_succeed
+PID=$!
+echo "---------------------------start erasing_emmc---------------------------" >> ${ECHO_TTY}
+# erasing_emmc
+echo "---------------------------end erasing_emmc---------------------------" >> ${ECHO_TTY}
 
-if [ x"$HOSTNAME" == x"$MYS_NAME" ];then
-  reboot
-fi
+echo "---------------------------start fidsk_emmc---------------------------" >> ${ECHO_TTY}
+fidsk_emmc
+echo "---------------------------end fidsk_emmc---------------------------" >> ${ECHO_TTY}
+
+echo "---------------------------start burn_boot---------------------------" >> ${ECHO_TTY}
+burn_boot
+echo "---------------------------end burn_boot---------------------------" >> ${ECHO_TTY}
+
+echo "---------------------------start burn_image---------------------------" >> ${ECHO_TTY}
+# burn_image
+echo "---------------------------end burn_image---------------------------" >> ${ECHO_TTY}
+
+echo "---------------------------start burn_rootfs---------------------------" >> ${ECHO_TTY}
+burn_rootfs
+echo "---------------------------end burn_rootfs---------------------------" >> ${ECHO_TTY}
+
+resize2fs_emmc
+
+echo "---------------------------success---------------------------" >> ${ECHO_TTY}
+echo "---------------------------success---------------------------" >> ${ECHO_TTY}
+echo "---------------------------success---------------------------" >> ${ECHO_TTY}
+sleep 3                                                                                       
+kill $PID                                                                                     
+update_success

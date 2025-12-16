@@ -12,28 +12,37 @@ S = "${WORKDIR}"
 
 SRC_URI = "file://home/root/burn_emmc.sh \
            file://fac-burn-emmc.service \
+	   file://Manifest \
 	   file://COPYING.MIT \
           "
 
 do_install(){
   install -d ${D}${systemd_system_unitdir}
-        install -d ${D}/home/root/mfgimage
-        install -d ${D}/home/root/mfgimage/bootloader
+        install -d ${D}/home/root/t2h_image
+        install -d ${D}/home/root/t2h_image/bootloader
 
         install -m 755 ${WORKDIR}/fac-burn-emmc.service ${D}${systemd_system_unitdir}/fac-burn-emmc.service
 
         install -m 755 ${WORKDIR}/home/root/burn_emmc.sh ${D}/home/root/burn_emmc.sh
  
         for i in ${IMAGE_BOOT_FILES};do
-                install -m 755 ${DEPLOY_DIR_IMAGE}/${i} ${D}/home/root/mfgimage/bootloader/${i}
+                install -m 755 ${DEPLOY_DIR_IMAGE}/${i} ${D}/home/root/t2h_image/bootloader/${i}
         done
 
-
-        install -m 755 ${DEPLOY_DIR_IMAGE}/myir-image-full-${MACHINE}.tar.gz  ${D}/home/root/mfgimage/myir-image-full-${MACHINE}.tar.gz
+	install -m 755 ${DEPLOY_DIR_IMAGE}/bl2_bp_emmc-myd-yt2h.bin   ${D}/home/root/t2h_image/
+	install -m 755 ${DEPLOY_DIR_IMAGE}/bl2_bp_xspi1-myd-yt2h.bin  ${D}/home/root/t2h_image/
+	install -m 755 ${DEPLOY_DIR_IMAGE}/fip-myd-yt2h.bin           ${D}/home/root/t2h_image/
+	install -m 755 ${DEPLOY_DIR_IMAGE}/Image                       ${D}/home/root/t2h_image/
+	install -m 755 ${S}/Manifest                                     ${D}/home/root/t2h_image/
+        install -m 755 ${DEPLOY_DIR_IMAGE}/myir-image-full-myd-yt2h.ext4  ${D}/home/root/t2h_image/myir-image-full-myd-yt2h.ext4
 }
 
 
-FILES_${PN} = "/"
+
+FILES:${PN} = "  \
+		/home/root/t2h_image/ \
+		/home/root/burn_emmc.sh \
+              "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "fac-burn-emmc.service"

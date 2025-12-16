@@ -1,0 +1,5 @@
+bl2file="bl2_bp_emmc-myd-yt2h.bin"
+fipfile="fip-myd-yt2h.bin"
+imagefile="Image"
+dtbfile="myb-yt2hx-display.dtb"
+rootfsfile="myir-image-full-myd-yt2h.ext4"
