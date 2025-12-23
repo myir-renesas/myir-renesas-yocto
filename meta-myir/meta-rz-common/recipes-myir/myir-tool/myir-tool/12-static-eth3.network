@@ -3,5 +3,8 @@ Name=eth3
 
 [Network]
 Address=192.168.1.10/24
-Gateway=192.168.1.1
-DNS=114.114.114.114
+DHCP=ipv4
+
+[DHCP]
+UseDNS=true
+UseRoutes=true

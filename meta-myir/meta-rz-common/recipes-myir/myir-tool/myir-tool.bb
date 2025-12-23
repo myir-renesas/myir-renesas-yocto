@@ -22,8 +22,8 @@ do_install() {
 	#install -d ${D}/etc/
 	install -d ${D}/${sysconfdir}/systemd/network/
 
-	install -m 755 ${S}/11-static-eth1.network  ${D}/${sysconfdir}/systemd/network/
-	install -m 755 ${S}/12-static-eth2.network  ${D}/${sysconfdir}/systemd/network/
+	install -m 755 ${S}/11-static-eth2.network  ${D}/${sysconfdir}/systemd/network/
+	install -m 755 ${S}/12-static-eth3.network  ${D}/${sysconfdir}/systemd/network/
 	install -m 0644 ${S}/etc/72-eth-rename.rules ${D}${sysconfdir}/udev/rules.d/72-eth-rename.rules
         #install -m 755 ${S}/etc/myir_test/* ${D}/etc/myir_test/ 
         #install -m 755 ${S}/etc/hostapd.conf ${D}/etc/hostapd.conf 
