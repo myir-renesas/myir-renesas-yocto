@@ -48,6 +48,7 @@ IMAGE_INSTALL_append = " \
 	tzdata \
 	myir-tool \
 	fw-config \
+	qspi-pnsn \
 "
 IMAGE_INSTALL_remove = "connman"
 
