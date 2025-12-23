@@ -115,8 +115,7 @@ sfdisk --force ${DRIVE} << EOF
 60M,,83
 EOF
 cmd_check $? "Re-partition device"
-
-
+ 
 MAX_TRIES=4
 
 for ((i=1; i<=MAX_TRIES; i++)); do
@@ -124,10 +123,13 @@ for ((i=1; i<=MAX_TRIES; i++)); do
         echo "[OK] $DEVICE exists (Attempt $i succeeded)" >> ${ECHO_TTY}
 		umount ${DRIVE}p1
 		umount ${DRIVE}p2
-		mkfs.vfat -F 32 -n "boot" ${DRIVE}p1  > /dev/null 2>&1
+		#mkfs.vfat -F 32 -n "boot" ${DRIVE}p1  > /dev/null 2>&1
+		mkfs.vfat -F 32 -n "boot" ${DRIVE}p1  >> ${ECHO_TTY}
+echo "mkfs.ext 111111mmcblk0p1" >> ${ECHO_TTY}
 		cmd_check $? "Formating boot partition"
 		#mkfs.ext4  ${DRIVE}p2 > /dev/null 2>&1
-		mkfs.ext4 -F -L "rootfs" ${DRIVE}p2 > /dev/null 2>&1
+		#mkfs.ext4 -F -L "rootfs" ${DRIVE}p2 > /dev/null 2>&1
+		mkfs.ext4 -F -L "rootfs" ${DRIVE}p2 >> ${ECHO_TTY}
 		cmd_check $? "Formating rootfs partition"
         break
     else
@@ -140,13 +142,13 @@ bootpart=`basename ${DRIVE}p1`
 rootpart=`basename ${DRIVE}p2`
 }
 
-erasing_emmc()
+erasing_env()
 {
 	# Erasing eMMC
-	echo -e "\n== Destroying Master Boot Record (sector 0) ==" >> ${ECHO_TTY}
+	echo -e "\n== Erasing mmc env area... ==" >> ${ECHO_TTY}
 	sleep 1
-	echo dd if=/dev/zero of=${DRIVE} bs=512 count=1
-	dd if=/dev/zero of=${DRIVE} bs=512 count=1
+	dd if=/dev/zero of=/dev/mmcblk0 bs=512 seek=$((0x900000/512)) count=$((0x20000/512)) conv=notrunc
+	cmd_check $? "Erasing mmc env.."
 	sync
 }
 
@@ -171,7 +173,7 @@ burn_image()
 
 	cp ${IMAGE_FILE} /run/media/${bootpart}
 	cmd_check $? "Update kernel"
-	cp ${DTBS_FILE} /run/media/${bootpart}
+	cp /home/root/t2h_image/bootloader/* /run/media/${bootpart}
 	cmd_check $? "Update dtb"
 	sync
 }
@@ -193,8 +195,8 @@ resize2fs_emmc()
 
 burn_start_ing &
 PID=$!
-echo "---------------------------start erasing_emmc---------------------------" >> ${ECHO_TTY}
-# erasing_emmc
+echo "---------------------------start erasing_env---------------------------" >> ${ECHO_TTY}
+erasing_env
 echo "---------------------------end erasing_emmc---------------------------" >> ${ECHO_TTY}
 
 echo "---------------------------start fidsk_emmc---------------------------" >> ${ECHO_TTY}
@@ -206,7 +208,7 @@ burn_boot
 echo "---------------------------end burn_boot---------------------------" >> ${ECHO_TTY}
 
 echo "---------------------------start burn_image---------------------------" >> ${ECHO_TTY}
-# burn_image
+burn_image
 echo "---------------------------end burn_image---------------------------" >> ${ECHO_TTY}
 
 echo "---------------------------start burn_rootfs---------------------------" >> ${ECHO_TTY}
