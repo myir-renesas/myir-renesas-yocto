@@ -194,7 +194,6 @@ static int payload_init(struct rpmsg_device *rdev, struct payload_info *pi) {
     if ((rpmsg_buf_size = rpmsg_virtio_get_buffer_size(rdev)) <= 0) {
         return rpmsg_buf_size;
     }
-
     pi->min = 1;
     pi->max = rpmsg_buf_size - 24;
     pi->num = pi->max / pi->min;

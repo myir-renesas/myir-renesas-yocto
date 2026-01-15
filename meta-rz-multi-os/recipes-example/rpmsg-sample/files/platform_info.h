@@ -71,7 +71,7 @@
 
 // Shared memory config
 #if (RPMSG_REMOTE_CORE == 0)
-#define SHM_DEV_NAME    "3e0001000.intercpu-shm"
+#define SHM_DEV_NAME    "2e0001000.intercpu-shm"
 #elif (RPMSG_REMOTE_CORE == 1)	
 #define SHM_DEV_NAME    "206001000.intercpu-shm"
 #endif
@@ -87,7 +87,7 @@
 #if (RPMSG_REMOTE_CORE == 0)
 #define ADDRESS_CR_DDR_BASE     (0xE0000000)
 #define ADDRESS_CR_DDR_SIZE     (0x27FFFFFFF)
-#define ADDRESS_CA_DDR_BASE     (0x180000000)
+#define ADDRESS_CA_DDR_BASE     (0x200000000)
 #elif (RPMSG_REMOTE_CORE == 1)	
 #define ADDRESS_CR_DDR_BASE     (0xC0000000)
 #define ADDRESS_CR_DDR_SIZE     (0x2FFFFFFF)

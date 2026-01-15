@@ -42,8 +42,8 @@
 
 /* Resource table UIO device */
 #if (RPMSG_REMOTE_CORE == 0)
-#define CFG_RSCTBL_DEV_NAME     "260000000.rsctbl"
-#define CFG_RSCTBL_MEM_PA       (0x260000000U)
+#define CFG_RSCTBL_DEV_NAME     "2e0000000.rsctbl"
+#define CFG_RSCTBL_MEM_PA       (0x2e0000000U)
 #elif (RPMSG_REMOTE_CORE == 1)	
 #define CFG_RSCTBL_DEV_NAME     "206000000.rsctbl"
 #define CFG_RSCTBL_MEM_PA       (0x206000000U)
