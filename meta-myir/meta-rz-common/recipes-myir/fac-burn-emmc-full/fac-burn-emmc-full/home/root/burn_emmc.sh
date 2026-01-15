@@ -149,6 +149,8 @@ erasing_env()
 	sleep 1
 	dd if=/dev/zero of=/dev/mmcblk0 bs=512 seek=$((0x900000/512)) count=$((0x20000/512)) conv=notrunc
 	cmd_check $? "Erasing mmc env.."
+	dd if=/dev/zero of=/dev/mmcblk0 bs=512 seek=$((0x920000/512)) count=$((0x20000/512)) conv=notrunc
+        cmd_check $? "Erasing mmc backup env.."
 	sync
 }
 
