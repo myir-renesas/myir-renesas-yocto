@@ -332,3 +332,14 @@ IMAGE_ROOTFS_EXTRA_SPACE = "1048576"
 #SPDX_ARCHIVE_PACKAGED = "1"
 QT_DEMO = "1"
 IMAGE_INSTALL_append += " netdisp "
+
+EXTRA_IMAGE_FEATURES ?= "tools-sdk dev-pkgs "
+HOSTTOOLS += " fallocate pkg-config "
+IMAGE_INSTALL_append = " util-linux pkg-config libtool python3 python3-pymodbus \
+python3-flask python3-flask-login python3-pyserial python3-sqlite3 sqlite3 \
+libmodbus cmake make gcc-dev autoconf-dev binutils-dev libbfd cpp cpp-symlinks gcc \
+gcc-symlinks binutils binutils-symlinks autoconf g++ g++-symlinks automake git "
+WHITELIST_GPL-3.0_append = " libtool gcc-dev autoconf-dev binutils-dev libbfd cpp \
+cpp-symlinks gcc gcc-symlinks binutils binutils-symlinks autoconf g++ g++-symlinks \
+automake bison bison-dev "
+PREFERRED_VERSION_bison = "3.5.4"

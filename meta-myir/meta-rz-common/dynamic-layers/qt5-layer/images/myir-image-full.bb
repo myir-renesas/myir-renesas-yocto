@@ -8,9 +8,9 @@ IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
 LICENSE = "MIT"
 inherit core-image features_check
 
-WHITELIST_GPL-3.0 += "gnutls-locale-zh-cn libidn2-locale-zh-cn"
-GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
-IMAGE_LINGUAS = "zh-cn"
+#WHITELIST_GPL-3.0 += "gnutls-locale-zh-cn libidn2-locale-zh-cn"
+#GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
+#IMAGE_LINGUAS = "zh-cn"
 
 #IMAGE_FEATURES_remove = "splash"
 IMAGE_INSTALL_append = " packagegroup-qt5-myir "
