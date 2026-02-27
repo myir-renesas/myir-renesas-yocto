@@ -49,6 +49,7 @@ IMAGE_INSTALL_append = " \
 	myir-tool \
 	fw-config \
 	qspi-pnsn \
+	bridge-utils \
 "
 IMAGE_INSTALL_remove = "connman"
 
